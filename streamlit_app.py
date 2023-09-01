@@ -15,19 +15,19 @@ st.map(data=df,
        longitude='lon', 
        zoom=5,
        )
-# fig = px.density_mapbox(df, 
-#                         lat='lat', lon='lon', 
-#                         z = 'imd_score', radius=5,
-#                         zoom=6,
-#                         #color='brand', 
-#                         hover_name='urban_rural_desc', 
-#                         #mapbox_style='open-street-map',
-#                         mapbox_style='stamen-terrain', 
-#                         opacity=0.3,
-#                         title='test',
-#                         width=800, height=800,
-# )
+fig = px.density_mapbox(df, 
+                        lat='lat', lon='lon', 
+                        z = 'imd_score', radius=5,
+                        zoom=6,
+                        #color='brand', 
+                        hover_name='urban_rural_desc', 
+                        #mapbox_style='open-street-map',
+                        mapbox_style='stamen-terrain', 
+                        opacity=0.3,
+                        title='test',
+                        width=800, height=800,
+)
 
 # fig.show()
-#st.plotly_chart(fig)
+st.plotly_chart(fig)
 
