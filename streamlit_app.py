@@ -5,24 +5,29 @@ import plotly.express as px
 
 st.title('Test Dashboard using streamlit')
 
-nosrl_df = pd.read_csv("data/nosrl_data_20230825-120846.csv")
+nosrl_df = pd.read_csv("data/nosrl_data.csv")
 #segments_df = pd.read_csv("data/segment_data_20230901-104355.csv")
 
 df = nosrl_df
 
-fig = px.density_mapbox(df, 
-                        lat='lat', lon='lon', 
-                        z = 'imd_score', radius=5,
-                        zoom=6,
-                        #color='brand', 
-                        hover_name='urban_rural_desc', 
-                        #mapbox_style='open-street-map',
-                        mapbox_style='stamen-terrain', 
-                        opacity=0.3,
-                        title='test',
-                        width=800, height=800,
-)
+st.map(data=df, 
+       latitude='lat', 
+       longitude='lon', 
+       zoom=5,
+       )
+# fig = px.density_mapbox(df, 
+#                         lat='lat', lon='lon', 
+#                         z = 'imd_score', radius=5,
+#                         zoom=6,
+#                         #color='brand', 
+#                         hover_name='urban_rural_desc', 
+#                         #mapbox_style='open-street-map',
+#                         mapbox_style='stamen-terrain', 
+#                         opacity=0.3,
+#                         title='test',
+#                         width=800, height=800,
+# )
 
 # fig.show()
-st.plotly_chart(fig)
+#st.plotly_chart(fig)
 
