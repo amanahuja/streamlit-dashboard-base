@@ -133,6 +133,8 @@ plot_donut_chart(selected_column, threshold)
 
 ## 3.2 Sunburst Chart 1
 
+# insert divider
+st.divider()
 st.header('Sunburst Chart')
 
 def create_sunburst_plot(group1, group1_threshold, group2, group2_threshold):
@@ -184,8 +186,6 @@ def create_sunburst_plot(group1, group1_threshold, group2, group2_threshold):
     # fig.show()
     st.plotly_chart(fig)
 
-# insert divider
-st.divider()
 
 var_options = ['parent_company', 'material', 'brand_category', 'object', 'brand', 'object_category']
 
