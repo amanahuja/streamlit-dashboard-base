@@ -86,7 +86,7 @@ def plot_donut_chart(selected_column, threshold):
     other_categories = column_counts[column_counts < threshold_count].index
     other_count = column_counts[column_counts < threshold_count].sum()
     column_counts = column_counts[column_counts >= threshold_count]
-    column_counts['other'] = other_count
+    column_counts['other'] = column_counts.get('other', 0) + other_count 
 
     # Create a donut chart using Plotly
     fig = px.pie(column_counts, 
