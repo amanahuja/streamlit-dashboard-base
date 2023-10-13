@@ -24,7 +24,6 @@ comb_map = pd.read_csv(
         usecols= ['object', 'material', 'volume', 'weight']
         )
 
-
 full_df = points_df.merge(
         comb_map[['object', 'material', 'weight', 'volume']], 
         on=['object', 'material'], 
@@ -117,17 +116,31 @@ def plot_donut_chart(selected_column, threshold):
 # Create a dropdown widget to select the column to plot
 column_options = ['object', 'material', 'brand', 'object_category']
 selected_column = st.selectbox('Select Column:', column_options)
+
 # set the width of the selectbox
 # st.markdown('<style>div[role="listbox"] .Select-arrow {display: none;}</style>', unsafe_allow_html=True)
 # selected_column = st.selectbox('Select Column:', column_options, key='selectbox', format_func=lambda x: x)
 
+# treshold and slider values for each column
+column_configurations = {
+    'object': {'min_value': 0.0, 'max_value': 5.0, 'step': 0.2, 'value': 2.0},
+    'material': {'min_value': 0.0, 'max_value': 3.0, 'step': 0.1, 'value': 0.0},
+    'brand': {'min_value': 0.0, 'max_value': 3.0, 'step': 0.1, 'value': 1.2},
+    'parent_company': {'min_value': 0.0, 'max_value': 3.0, 'step': 0.1, 'value': 1.2},
+}
+
+# Get the selected column configuration or use a default configuration
+def get_slider_config(selected_column):
+    return column_configurations.get(
+            selected_column, 
+            # default values here:  
+            {'min_value': 0.0, 'max_value': 3.0, 'step': 0.1, 'value': 0.0},
+            )
+
+slider_config = get_slider_config(selected_column)
+
 # Create a slider widget for the threshold
-threshold = st.slider(
-        'Threshold:', 
-        min_value=0, max_value=20, 
-        step=1, 
-        value=2
-        )
+threshold = st.slider('Threshold:', **slider_config)
 
 plot_donut_chart(selected_column, threshold)
 
@@ -195,12 +208,15 @@ col1, col2 = st.columns(2)
 # Widgets for group 1 (left column)
 with col1:
     group1 = st.selectbox('Inner Category:', var_options, index=1)
-    threshold_g1 = st.slider('Threshold (inner):', min_value=0, max_value=20, value=2)
+    # threshold_g1 = st.slider('Threshold (inner):', min_value=0, max_value=20, value=2)
+    slider_config = get_slider_config(group1)
+    threshold_g1 = st.slider('Threshold (inner):', **slider_config)
 
 # Widgets for group 2 (right column)
 with col2:
     group2 = st.selectbox('Outer Category:', var_options, index=5)
-    threshold_g2 = st.slider('Threshold (outer):', min_value=0, max_value=20, value=2)
+    slider_config = get_slider_config(group2)
+    threshold_g2 = st.slider('Threshold (outer):', **slider_config)
 
 # Check if group1 and group2 are the same, and raise a ValueError if they are
 if group1 == group2:
