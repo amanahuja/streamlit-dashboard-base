@@ -97,8 +97,16 @@ def plot_donut_chart(selected_column, threshold):
 
     # Update layout for better aesthetics and larger size
     fig.update_traces(
+            # values to display
             textinfo='percent+label', 
-            insidetextfont=dict(color='white'),
+            hovertemplate='<b>%{label}</b><br>Count: %{value}',
+
+            # fonts
+            insidetextfont=dict(size=18),
+            outsidetextfont=dict(size=18),
+            hoverlabel=dict(font=dict(size=18)),
+
+            # other
             showlegend=False
             )
     fig.update_layout(width=800, height=800)
@@ -182,14 +190,18 @@ def create_sunburst_plot(group1, group1_threshold, group2, group2_threshold):
 
     # Setting font size (optional)
     fig.update_layout(uniformtext=dict(
-        minsize=15,   # set the font size 
+        minsize=18,   # set the font size 
         mode='hide'))   # if mode is 'hide', text will be hidden when the wedge is too small
     
     # Customize hover text and textinfo
     fig.update_traces(
-            #textinfo='label+value+percent parent',
-            textinfo='label',
-            hovertemplate='<b>%{label}</b><br>Count: %{value}'
+            # values to display
+            textinfo='label+percent entry',
+            # texttemplate='%{label}<br>%{percent entry:,.0f}',
+            hovertemplate='<b>%{label}</b><br>Count: %{value:,.0f}',
+
+            #fonts
+            hoverlabel=dict(font=dict(size=18)),
             )
 
     # Setting 
