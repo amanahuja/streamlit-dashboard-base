@@ -122,7 +122,7 @@ selected_column = st.selectbox('Select Column:', column_options)
 # selected_column = st.selectbox('Select Column:', column_options, key='selectbox', format_func=lambda x: x)
 
 # treshold and slider values for each column
-column_configurations = {
+slider_configurations = {
     'object': {'min_value': 0.0, 'max_value': 5.0, 'step': 0.2, 'value': 2.0},
     'material': {'min_value': 0.0, 'max_value': 3.0, 'step': 0.1, 'value': 0.0},
     'brand': {'min_value': 0.0, 'max_value': 3.0, 'step': 0.1, 'value': 1.2},
@@ -131,7 +131,7 @@ column_configurations = {
 
 # Get the selected column configuration or use a default configuration
 def get_slider_config(selected_column):
-    return column_configurations.get(
+    return slider_configurations.get(
             selected_column, 
             # default values here:  
             {'min_value': 0.0, 'max_value': 3.0, 'step': 0.1, 'value': 0.0},
