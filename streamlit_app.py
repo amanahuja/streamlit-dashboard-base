@@ -29,6 +29,27 @@ full_df = points_df.merge(
         on=['object', 'material'], 
         how='left')
 
+segments_df = pd.read_csv("data/segments_counts_oct18_2023_v2.csv")
+segment_cols = {
+    'segment_id': 'segment_id',
+    'all_count': 'litter_count',
+    'non_srl_count': 'count_nosrl',
+    'food_count': 'count_food',
+    'drink_count': 'count_drink',
+    'wrapper_count': 'count_wrapper',
+    'bottle_count': 'count_bottle',
+    'can_count': 'count_can',
+    'segment_distance': 'segment_length',
+    'land_use': 'land_use',
+    'Region': 'region',
+    'imd_score': 'imd_score',
+    #'imd_decile': 'imd_decile',
+    'imd_quintile': 'imd_quintile',
+    'urban_rural': 'urban_rural_desc',
+}
+segments_df = segments_df[segment_cols.keys()].rename(
+        columns=segment_cols, errors='ignore')
+
 ## style prep
 litterati_color = '#0179ff'
 
@@ -52,6 +73,28 @@ litterati_colors = [
     "#ff99cc"    # Light Pink Shade
 ]
 
+display_map = {
+ 'segment_id': 'Segment ID',
+ 'litter_count': 'Total Litter',
+ 'count_nosrl': 'Non Smoking Related Litter',
+ 'count_food': 'Food Litter',
+ 'count_drink': 'Drink Litter',
+ 'count_wrapper': 'Wrappers',
+ 'count_bottle': 'Bottles',
+ 'count_bottles_and_cans': 'Bottles and Cans',
+ 'count_can': 'Cans',
+ 'segment_length': 'Segment Length',
+ 'land_use': 'Land Use Type',
+ 'region': 'Region of England',
+ 'imd_score': 'IMD Score',
+ 'imd_decile': 'IMD Decile',
+ 'imd_quintile': 'IMD Quintile (int)',
+ 'imd_quintile_cat': 'IMD Quintile',
+ 'urban_rural': 'Urban vs Rural',
+ 'urban_rural_desc': 'Urban vs Rural description',
+ 'urban_rural_class': 'Urban vs Rural class',
+}
+
 ## 2. App layout
 
 st.title('KBT: Interactive Visualizations')
@@ -61,8 +104,8 @@ st.divider()
 
 ## 3. Visualization 
 
+# select which dataframe to use
 df = full_df
-# st.write(full_df.head(3).T)
 
 ## 3.1 Donut Chart
 
@@ -202,8 +245,8 @@ def create_sunburst_plot(group1, group1_threshold, group2, group2_threshold):
 
             # fonts
             hoverlabel=dict(font=dict(size=18)),
-            # insidetextfont=dict(size=18),
-            # outsidetextfont=dict(size=18),
+            insidetextfont=dict(size=18),
+            outsidetextfont=dict(size=18),
             )
 
     # Setting 
@@ -238,7 +281,111 @@ if group1 == group2:
 else:
     create_sunburst_plot(group1, threshold_g1, group2, threshold_g2)
 
-## Xxxx map viz test
+## 3.4 Histogram of LPM 
+
+# select which dataframe to use
+df = segments_df
+
+st.divider()
+st.header('Litter Per Meter')
+
+## Utilities
+def compute_lpm(df, group_column, count_column):
+    """Compute LPM for a groupby operation"""
+    # Group by the specified column and calculate the sum of the count_column and segment_length
+    grouped = df.groupby(group_column).agg({count_column: 'sum', 'segment_length': 'sum'})
+
+    # Calculate LPM for each group
+    grouped['LPM'] = grouped[count_column] / grouped['segment_length']
+
+    # Reset the index to have a new DataFrame with the group_column as a regular column
+    grouped.reset_index(inplace=True)
+
+    return grouped
+
+# plot LPM
+def plot_lpm(lpmdf, group_column, count_column):
+    
+    # sort
+    lpmdf = lpmdf.sort_values(by='LPM', ascending=True)
+    
+    # Create a bar chart
+    title = f'LPM for "{display_map[count_column]}" by {display_map[group_column]}'
+    fig = px.bar(
+            lpmdf, 
+            x='LPM', 
+            y=group_column, 
+            title=title,
+            color_discrete_sequence=litterati_colors
+            )
+
+    # Customize the chart appearance
+    fig.update_layout(
+        width=800, height=800, 
+        yaxis=dict(
+            title=display_map[group_column], 
+            title_font=dict(size=18),
+            tickfont=dict(size=15)),
+        xaxis=dict(
+            title='LPM (Litter per Meter)', 
+            title_font=dict(size=18),
+            tickfont=dict(size=15)),
+
+        # font of text inside the bars
+        font=dict(size=14),
+        )
+
+    # update the chart title positioning
+    # fig.update_layout(title={'x':0.5, 'xanchor': 'center', 'yanchor': 'top'})
+
+    fig.update_traces(
+        texttemplate='%{x:.02f}',
+        hovertemplate='<b>%{y}</b><br>LPM: %{x:.02f}',
+        hoverlabel=dict(font=dict(size=16)),
+    )
+
+    return fig
+
+# Create dropdown widgets for selecting group_column and count_column
+group_column_selector = st.selectbox(
+        'Group by', 
+        [display_map[c] for c in ['region', 'urban_rural_desc', 'land_use', 'imd_quintile_cat']],
+        index=0)
+
+count_column_selector = st.selectbox(
+        'Count column:',
+        [display_map[c] for c in ['litter_count', 'count_nosrl', 'count_food', 'count_drink', 'count_wrapper', 'count_bottle', 'count_can']],
+        index=1)
+
+
+# Create a function that updates the plot based on dropdown values
+def update_plot(group_column, count_column):
+    # Reverse lookup from the display_map to get the actual column names
+    group_column = [k for k, v in display_map.items() if v == group_column][0]
+    count_column = [k for k, v in display_map.items() if v == count_column][0]
+    
+    lpm_group_df = compute_lpm(df, group_column, count_column)
+    fig = plot_lpm(lpm_group_df, group_column, count_column)
+
+    st.plotly_chart(fig)
+
+# Call the update_plot function with the initial selections
+update_plot(group_column_selector, count_column_selector)
+
+# Use interactive_output to link the function and the dropdowns
+# output = interactive_output(update_plot, {'group_column': group_column_selector, 'count_column': count_column_selector})
+
+# Display the dropdown widgets
+#display(group_column_selector, count_column_selector, output)
+
+# Manual usage - disabled
+# group_column = 'region'
+# count_column = 'count_nosrl'
+
+
+
+
+## 3.X map viz test
 # st.map(data=df, 
 #        latitude='lat', 
 #        longitude='lon', 
