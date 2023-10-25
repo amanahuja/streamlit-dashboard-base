@@ -200,8 +200,10 @@ def create_sunburst_plot(group1, group1_threshold, group2, group2_threshold):
             # texttemplate='%{label}<br>%{percent entry:,.0f}',
             hovertemplate='<b>%{label}</b><br>Count: %{value:,.0f}',
 
-            #fonts
+            # fonts
             hoverlabel=dict(font=dict(size=18)),
+            # insidetextfont=dict(size=18),
+            # outsidetextfont=dict(size=18),
             )
 
     # Setting 
