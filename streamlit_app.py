@@ -17,6 +17,23 @@ import os
 # data import
 points_data_file = 'data/points_with_covariates_20231003.csv'
 points_df = pd.read_csv(points_data_file)
+points_cols = {
+        "object": "object",
+        "object_category": "object_category",
+        "material": "material",
+        "brand": "brand",
+        "brand_category": "brand_category",
+        "parent_company": "parent_company",
+        "LSOA": "LSOA",
+        "Region": "region",
+        "land_use":  "land_use",
+        "urban_rural":  "urban_rural_desc",
+        "imd_score":  "imd_score",
+        #"imd_decile":  "imd_decile",
+        "image_url":  "image_url",
+        }
+points_df = points_df[points_cols.keys()].rename(
+        columns=points_cols, errors='ignore')
 
 comb_data_file = 'data/kbt_comb_weights_volumes_20230803.csv'
 comb_map = pd.read_csv(
@@ -53,6 +70,16 @@ segments_df = segments_df[segment_cols.keys()].rename(
 # add a new count combining bottles and cans
 segments_df['count_bottles_and_cans'] = (segments_df['count_bottle'] + 
                                          segments_df['count_can'])
+
+
+# add a new grouping column for simplified urban/rural designation
+def set_urban_rural_class(desc): 
+    if 'urban' in desc.lower(): 
+        return 'urban'
+    else:
+        return 'rural'
+
+segments_df['urban_rural_class'] = segments_df.urban_rural_desc.apply(set_urban_rural_class)
 
 ## style prep
 litterati_color = '#0179ff'
@@ -95,8 +122,8 @@ display_map = {
  'imd_quintile': 'IMD Quintile (int)',
  'imd_quintile_cat': 'IMD Quintile',
  'urban_rural': 'Urban vs Rural',
- 'urban_rural_desc': 'Urban vs Rural description',
- 'urban_rural_class': 'Urban vs Rural class',
+ 'urban_rural_desc': 'Urban / Rural description',
+ 'urban_rural_class': 'Urban / Rural class',
 }
 
 ## 2. App layout
@@ -257,11 +284,9 @@ def create_sunburst_plot(group1, group1_threshold, group2, group2_threshold):
     fig.update_layout(width=800, height=800)
 
     # Show the plot
-    # fig.show()
     st.plotly_chart(fig)
 
-
-var_options = ['parent_company', 'material', 'brand_category', 'object', 'brand', 'object_category']
+var_options = ['parent_company', 'material', 'brand_category', 'object', 'brand', 'object_category', 'urban_rural_desc']
 
 # Create two equal-sized columns
 col1, col2 = st.columns(2)
@@ -351,7 +376,7 @@ def plot_lpm(lpmdf, group_column, count_column):
     return fig
 
 # Create dropdown widgets for selecting group_column and count_column
-group_col_options = ['region', 'urban_rural_desc', 'land_use', 'imd_quintile_cat']
+group_col_options = ['region', 'urban_rural_desc', 'land_use', 'imd_quintile_cat', 'urban_rural_desc']
 group_column_selector = st.selectbox(
         'Group by', 
         [display_map[c] for c in group_col_options],
@@ -377,19 +402,6 @@ def update_plot(group_column, count_column):
 
 # Call the update_plot function with the initial selections
 update_plot(group_column_selector, count_column_selector)
-
-# Use interactive_output to link the function and the dropdowns
-# output = interactive_output(update_plot, {'group_column': group_column_selector, 'count_column': count_column_selector})
-
-# Display the dropdown widgets
-#display(group_column_selector, count_column_selector, output)
-
-# Manual usage - disabled
-# group_column = 'region'
-# count_column = 'count_nosrl'
-
-
-
 
 ## 3.X map viz test
 # st.map(data=df, 
