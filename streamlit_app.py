@@ -80,6 +80,7 @@ def set_urban_rural_class(desc):
         return 'rural'
 
 segments_df['urban_rural_class'] = segments_df.urban_rural_desc.apply(set_urban_rural_class)
+full_df['urban_rural_class'] = full_df.urban_rural_desc.apply(set_urban_rural_class)
 
 ## style prep
 litterati_color = '#0179ff'
@@ -129,7 +130,7 @@ display_map = {
 ## 2. App layout
 
 st.title('KBT: Interactive Visualizations')
-st.markdown('Draft. **Last updated: 2023 October 4**')
+st.markdown('Draft. **Last updated: 2023 October 25**')
 st.markdown('*Data and results are under review and subject to change*')
 st.divider()
 
@@ -286,7 +287,7 @@ def create_sunburst_plot(group1, group1_threshold, group2, group2_threshold):
     # Show the plot
     st.plotly_chart(fig)
 
-var_options = ['parent_company', 'material', 'brand_category', 'object', 'brand', 'object_category', 'urban_rural_desc']
+var_options = ['parent_company', 'material', 'brand_category', 'object', 'brand', 'object_category', 'urban_rural_class', 'urban_rural_desc']
 
 # Create two equal-sized columns
 col1, col2 = st.columns(2)
@@ -376,7 +377,7 @@ def plot_lpm(lpmdf, group_column, count_column):
     return fig
 
 # Create dropdown widgets for selecting group_column and count_column
-group_col_options = ['region', 'urban_rural_desc', 'land_use', 'imd_quintile_cat', 'urban_rural_desc']
+group_col_options = ['region', 'urban_rural_class', 'land_use', 'imd_quintile_cat', 'urban_rural_desc']
 group_column_selector = st.selectbox(
         'Group by', 
         [display_map[c] for c in group_col_options],
