@@ -50,6 +50,10 @@ segment_cols = {
 segments_df = segments_df[segment_cols.keys()].rename(
         columns=segment_cols, errors='ignore')
 
+# add a new count combining bottles and cans
+segments_df['count_bottles_and_cans'] = (segments_df['count_bottle'] + 
+                                         segments_df['count_can'])
+
 ## style prep
 litterati_color = '#0179ff'
 
@@ -347,14 +351,16 @@ def plot_lpm(lpmdf, group_column, count_column):
     return fig
 
 # Create dropdown widgets for selecting group_column and count_column
+group_col_options = ['region', 'urban_rural_desc', 'land_use', 'imd_quintile_cat']
 group_column_selector = st.selectbox(
         'Group by', 
-        [display_map[c] for c in ['region', 'urban_rural_desc', 'land_use', 'imd_quintile_cat']],
+        [display_map[c] for c in group_col_options],
         index=0)
 
+count_col_options = ['litter_count', 'count_nosrl', 'count_food', 'count_drink', 'count_wrapper', 'count_bottles_and_cans', 'count_bottle', 'count_can']
 count_column_selector = st.selectbox(
         'Count column:',
-        [display_map[c] for c in ['litter_count', 'count_nosrl', 'count_food', 'count_drink', 'count_wrapper', 'count_bottle', 'count_can']],
+        [display_map[c] for c in count_col_options],
         index=1)
 
 
