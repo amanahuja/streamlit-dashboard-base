@@ -1,8 +1,12 @@
 # streamlit-dashboard-base
-Experiment with building a simple dashboard on streamlit. 
-Using temporarily for project with litterati
+Provide a set of visualizations using a streamlit dashboard. 
 
 todo
-* [ ] confirm approach and tech direction
-* [ ] move to client repository
-* 
+* [x] confirm approach and tech direction
+* [ ] move repo to client account
+
+Usage
+* activate venv: `$ source /venv/bin/activate`
+* run locally for testing `$ streamlit run streamlit_app.py`
+* commit to main branch for auto deployment using github actions. 
+
