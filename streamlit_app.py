@@ -378,8 +378,8 @@ def plot_lpm(lpmdf, group_column, count_column):
     # fig.update_layout(title={'x':0.5, 'xanchor': 'center', 'yanchor': 'top'})
 
     fig.update_traces(
-        texttemplate='%{x:.02f}',
-        hovertemplate='<b>%{y}</b><br>LPM: %{x:.02f}',
+        texttemplate='%{x:.04f}',
+        hovertemplate='<b>%{y}</b><br>LPM: %{x:.04f}',
         hoverlabel=dict(font=dict(size=16)),
     )
 
