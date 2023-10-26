@@ -46,7 +46,7 @@ full_df = points_df.merge(
         on=['object', 'material'], 
         how='left')
 
-segments_df = pd.read_csv("data/segments_counts_oct18_2023_v2.csv")
+segments_df = pd.read_csv("data/segments_counts_oct25_2023.csv")
 segment_cols = {
     'segment_id': 'segment_id',
     'all_count': 'litter_count',
@@ -56,14 +56,17 @@ segment_cols = {
     'wrapper_count': 'count_wrapper',
     'bottle_count': 'count_bottle',
     'can_count': 'count_can',
+    'all_cups_count': 'count_all_cups', # new
+    'fast_food_count': 'count_fastfood', # new
     'segment_distance': 'segment_length',
     'land_use': 'land_use',
     'Region': 'region',
-    'imd_score': 'imd_score',
-    #'imd_decile': 'imd_decile',
+    # 'imd_score': 'imd_score',
+    'imd_decile': 'imd_decile',
     'imd_quintile': 'imd_quintile',
     'urban_rural': 'urban_rural_desc',
 }
+
 segments_df = segments_df[segment_cols.keys()].rename(
         columns=segment_cols, errors='ignore')
 
@@ -71,6 +74,10 @@ segments_df = segments_df[segment_cols.keys()].rename(
 segments_df['count_bottles_and_cans'] = (segments_df['count_bottle'] + 
                                          segments_df['count_can'])
 
+
+# Update object type for IMD Quintiles
+segments_df['imd_quintile'] = segments_df.imd_quintile.astype(str)
+segments_df['imd_decile'] = segments_df.imd_decile.astype(str)
 
 # add a new grouping column for simplified urban/rural designation
 def set_urban_rural_class(desc): 
@@ -110,18 +117,20 @@ display_map = {
  'litter_count': 'Total Litter',
  'count_nosrl': 'Non Smoking Related Litter',
  'count_food': 'Food Litter',
+ 'count_fastfood': 'Fast Food Litter', 
  'count_drink': 'Drink Litter',
  'count_wrapper': 'Wrappers',
  'count_bottle': 'Bottles',
- 'count_bottles_and_cans': 'Bottles and Cans',
  'count_can': 'Cans',
+ 'count_bottles_and_cans': 'Bottles and Cans',
+ 'count_all_cups': 'All cups',
  'segment_length': 'Segment Length',
  'land_use': 'Land Use Type',
  'region': 'Region of England',
  'imd_score': 'IMD Score',
  'imd_decile': 'IMD Decile',
- 'imd_quintile': 'IMD Quintile (int)',
- 'imd_quintile_cat': 'IMD Quintile',
+ 'imd_quintile': 'IMD Quintile',
+ 'imd_decile': 'IMD Decile',
  'urban_rural': 'Urban vs Rural',
  'urban_rural_desc': 'Urban / Rural description',
  'urban_rural_class': 'Urban / Rural class',
@@ -377,13 +386,14 @@ def plot_lpm(lpmdf, group_column, count_column):
     return fig
 
 # Create dropdown widgets for selecting group_column and count_column
-group_col_options = ['region', 'urban_rural_class', 'land_use', 'imd_quintile_cat', 'urban_rural_desc']
+group_col_options = ['region', 'urban_rural_class', 'land_use', 'imd_quintile', 'imd_decile', 'urban_rural_desc']
 group_column_selector = st.selectbox(
         'Group by', 
         [display_map[c] for c in group_col_options],
         index=0)
 
-count_col_options = ['litter_count', 'count_nosrl', 'count_food', 'count_drink', 'count_wrapper', 'count_bottles_and_cans', 'count_bottle', 'count_can']
+count_col_options = ['litter_count', 'count_nosrl', 'count_food', 'count_drink', 'count_fastfood', 
+                     'count_all_cups', 'count_wrapper', 'count_bottles_and_cans', 'count_bottle', 'count_can']
 count_column_selector = st.selectbox(
         'Count column:',
         [display_map[c] for c in count_col_options],
